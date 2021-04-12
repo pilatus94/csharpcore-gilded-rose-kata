@@ -15,9 +15,9 @@ namespace csharpcore
         [InlineData("Aged Brie", 2, 0, 1, 1)]
         public void UpdateQuality_CorrectlyAdjustsPropertiesPerDay(string itemName, int initialSellIn, int initialQuality, int expectedSellIn, int expectedQuality)
         {
-            var item = new Item { Name = itemName, SellIn = initialSellIn, Quality = initialQuality };
+            Item item = new() { Name = itemName, SellIn = initialSellIn, Quality = initialQuality };
             IList<Item> items = new List<Item> { item };
-            var app = new GildedRose(items);
+            GildedRose app = new (items);
 
             app.UpdateQuality();
 
@@ -33,9 +33,9 @@ namespace csharpcore
         [InlineData(-3, 10, 8)]
         public void UpdateQuality_QualityDegradation(int initialSellIn, int initialQuality, int expectedQuality)
         {
-            var item = new Item { Name = "General", SellIn = initialSellIn, Quality = initialQuality };
+            Item item = new() { Name = "General", SellIn = initialSellIn, Quality = initialQuality };
             IList<Item> items = new List<Item> { item };
-            var app = new GildedRose(items);
+            GildedRose app = new(items);
 
             app.UpdateQuality();
             item.Quality.Should().Be(expectedQuality);
@@ -49,9 +49,9 @@ namespace csharpcore
         [InlineData(0, 10, 0)]
         public void UpdateQuality_BackstagePassQualityAdjustments(int initialSellIn, int initialQuality, int expectedQuality)
         {
-            var item = new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = initialSellIn, Quality = initialQuality };
+            Item item = new() { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = initialSellIn, Quality = initialQuality };
             IList<Item> items = new List<Item> { item };
-            var app = new GildedRose(items);
+            GildedRose app = new(items);
 
             app.UpdateQuality();
             item.Quality.Should().Be(expectedQuality);
@@ -60,11 +60,11 @@ namespace csharpcore
         [Fact]
         public void UpdateQuality_QualityIsNotNegative()
         {
-            var item = new Item { Name = "General", SellIn = 10, Quality = 10 };
+            Item item = new() { Name = "General", SellIn = 10, Quality = 10 };
             IList<Item> items = new List<Item> { item };
-            var app = new GildedRose(items);
+            GildedRose app = new(items);
 
-            for (int i = 0; i < 30; i++)
+            for (var i = 0; i < 30; i++)
             {
                 app.UpdateQuality();
 
@@ -75,14 +75,30 @@ namespace csharpcore
         [Fact]
         public void UpdateQuality_QualityIsNotHigherThan50()
         {
-            var item = new Item { Name = "Aged Brie", SellIn = 0, Quality = 49 };
+            Item item = new() { Name = "Aged Brie", SellIn = 0, Quality = 49 };
             IList<Item> items = new List<Item> { item };
-            var app = new GildedRose(items);
+            GildedRose app = new(items);
 
-            for (int i = 0; i < 30; i++)
+            for (var i = 0; i < 30; i++)
             {
                 app.UpdateQuality();
                 item.Quality.Should().BeLessOrEqualTo(50);
+            }
+        }
+
+        [Fact]
+        public void UpdateQuality_CorrectlyUpdatesQualityForConjuredItems()
+        {
+            var initialSellIn = 3;
+            var initialQuality = 6;
+            Item item = new() {Name = "Conjured Mana Cake", SellIn = initialSellIn, Quality = initialQuality};
+            GildedRose app = new(new List<Item> {item});
+
+            for (var i = 1; i <= 3; i++)
+            {
+                app.UpdateQuality();
+                item.SellIn.Should().Be(initialSellIn - i);
+                item.Quality.Should().Be(initialQuality - 2 * i);
             }
         }
     }

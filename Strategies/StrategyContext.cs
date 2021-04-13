@@ -3,27 +3,23 @@ using csharpcore.Items;
 
 namespace csharpcore.Strategies
 {
-    public class StrategyContext
+    public class UpdateStrategyContext
     {
         private IUpdateStrategy _strategy;
 
         public void SetUpdateStrategy(ItemCategory category)
         {
-            switch (category)
+            _strategy = category switch
             {
-                case ItemCategory.General:
-                    break;
-                case ItemCategory.Aged:
-                    break;
-                case ItemCategory.Conjured:
-                    break;
-                case ItemCategory.Pass:
-                    break;
-                case ItemCategory.Legendary:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(category), category, null);
-            }
+                ItemCategory.General => new GeneralItemStrategy(),
+                ItemCategory.Aged => new AgedItemStrategy(),
+                ItemCategory.Conjured => new ConjuredItemStrategy(),
+                ItemCategory.Pass => new PassItemStrategy(),
+                ItemCategory.Legendary => new LegendaryItemStrategy(),
+                _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+            };
         }
+
+        public void Update(StoreItem item) => _strategy.Update(item);
     }
 }

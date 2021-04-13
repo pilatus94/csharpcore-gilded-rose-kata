@@ -7,7 +7,7 @@ using ApprovalTests.Reporters;
 
 namespace csharpcore
 {
-    [UseReporter(typeof(DiffReporter))]
+    [UseReporter()]
     public class ApprovalTest
     {
         [Fact]

@@ -16,9 +16,9 @@ namespace csharpcore.Strategies
 
             item.Quality += item.SellIn switch
             {
-                >10 => 1,
-                >5 => 2,
-                >0 => 3,
+                >=10 => 1,
+                >=5 => 2,
+                >=0 => 3,
                 _ => throw new ArgumentOutOfRangeException()
             };
 

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using System.Collections.Generic;
+using csharpcore.Items;
 using Xunit;
 
 namespace csharpcore
@@ -7,38 +8,36 @@ namespace csharpcore
     public class GildedRoseTest
     {
         [Theory]
-        [InlineData("GeneralItem", 10, 20, 9, 19)]
-        [InlineData("GeneralItem", 0, 0, -1, 0)]
-        [InlineData("GeneralItem", 0, 20, -1, 18)]
-        [InlineData("Sulfuras, Hand of Ragnaros", 0, 80, 0, 80)]
-        [InlineData("Sulfuras, Hand of Ragnaros", -1, 80, -1, 80)]
-        [InlineData("Aged Brie", 2, 0, 1, 1)]
-        public void UpdateQuality_CorrectlyAdjustsPropertiesPerDay(string itemName, int initialSellIn, int initialQuality, int expectedSellIn, int expectedQuality)
+        [InlineData(ItemCategory.General, "GeneralItem", 10, 20, 9, 19)]
+        [InlineData(ItemCategory.General, "GeneralItem", 0, 0, -1, 0)]
+        [InlineData(ItemCategory.General, "GeneralItem", 0, 20, -1, 18)]
+        [InlineData(ItemCategory.Legendary, "Sulfuras, Hand of Ragnaros", 0, 80, 0, 80)]
+        [InlineData(ItemCategory.Legendary, "Sulfuras, Hand of Ragnaros", -1, 80, -1, 80)]
+        [InlineData(ItemCategory.Aged, "Aged Brie", 2, 0, 1, 1)]
+        public void UpdateQuality_CorrectlyAdjustsPropertiesPerDay(ItemCategory category, string itemName, int initialSellIn, int initialQuality, int expectedSellIn, int expectedQuality)
         {
-            Item item = new() { Name = itemName, SellIn = initialSellIn, Quality = initialQuality };
-            IList<Item> items = new List<Item> { item };
+            var items = GetListWithSingleItem(category, itemName, initialSellIn, initialQuality);
             GildedRose app = new (items);
 
             app.UpdateQuality();
 
-            item.Quality.Should().Be(expectedQuality);
-            item.SellIn.Should().Be(expectedSellIn);
+            items[0].Quality.Should().Be(expectedQuality);
+            items[0].SellIn.Should().Be(expectedSellIn);
         }
 
         [Theory]
-        [InlineData(1, 0, 0)]
-        [InlineData(0, 0, 0)]
-        [InlineData(-1, 2, 0)]
-        [InlineData(-2, 2, 0)]
-        [InlineData(-3, 10, 8)]
-        public void UpdateQuality_QualityDegradation(int initialSellIn, int initialQuality, int expectedQuality)
+        [InlineData(ItemCategory.General, 1, 0, 0)]
+        [InlineData(ItemCategory.General, 0, 0, 0)]
+        [InlineData(ItemCategory.General, -1, 2, 0)]
+        [InlineData(ItemCategory.General, -2, 2, 0)]
+        [InlineData(ItemCategory.General, -3, 10, 8)]
+        public void UpdateQuality_QualityDegradation(ItemCategory category, int initialSellIn, int initialQuality, int expectedQuality)
         {
-            Item item = new() { Name = "General", SellIn = initialSellIn, Quality = initialQuality };
-            IList<Item> items = new List<Item> { item };
+            var items = GetListWithSingleItem(category, string.Empty, initialSellIn, initialQuality);
             GildedRose app = new(items);
 
             app.UpdateQuality();
-            item.Quality.Should().Be(expectedQuality);
+            items[0].Quality.Should().Be(expectedQuality);
         }
 
         [Theory]
@@ -49,40 +48,37 @@ namespace csharpcore
         [InlineData(0, 10, 0)]
         public void UpdateQuality_BackstagePassQualityAdjustments(int initialSellIn, int initialQuality, int expectedQuality)
         {
-            Item item = new() { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = initialSellIn, Quality = initialQuality };
-            IList<Item> items = new List<Item> { item };
+            var items = GetListWithSingleItem(ItemCategory.Pass, "Backstage passes to a TAFKAL80ETC concert", initialSellIn, initialQuality);
             GildedRose app = new(items);
 
             app.UpdateQuality();
-            item.Quality.Should().Be(expectedQuality);
+            items[0].Quality.Should().Be(expectedQuality);
         }
 
         [Fact]
         public void UpdateQuality_QualityIsNotNegative()
         {
-            Item item = new() { Name = "General", SellIn = 10, Quality = 10 };
-            IList<Item> items = new List<Item> { item };
+            var items = GetListWithSingleItem(ItemCategory.General, string.Empty, 10, 10);
             GildedRose app = new(items);
 
             for (var i = 0; i < 30; i++)
             {
                 app.UpdateQuality();
 
-                item.Quality.Should().BeGreaterOrEqualTo(0);
+                items[0].Quality.Should().BeGreaterOrEqualTo(0);
             }
         }
 
         [Fact]
         public void UpdateQuality_QualityIsNotHigherThan50()
         {
-            Item item = new() { Name = "Aged Brie", SellIn = 0, Quality = 49 };
-            IList<Item> items = new List<Item> { item };
+            var items = GetListWithSingleItem(ItemCategory.Aged, "Aged Brie", 0, 49);
             GildedRose app = new(items);
 
             for (var i = 0; i < 30; i++)
             {
                 app.UpdateQuality();
-                item.Quality.Should().BeLessOrEqualTo(50);
+                items[0].Quality.Should().BeLessOrEqualTo(50);
             }
         }
 
@@ -91,15 +87,21 @@ namespace csharpcore
         {
             var initialSellIn = 3;
             var initialQuality = 6;
-            Item item = new() {Name = "Conjured Mana Cake", SellIn = initialSellIn, Quality = initialQuality};
-            GildedRose app = new(new List<Item> {item});
+            var items = GetListWithSingleItem(ItemCategory.Conjured, "Conjured Mana Cake", initialSellIn, initialQuality);
+            GildedRose app = new(items);
 
             for (var i = 1; i <= 3; i++)
             {
                 app.UpdateQuality();
-                item.SellIn.Should().Be(initialSellIn - i);
-                item.Quality.Should().Be(initialQuality - 2 * i);
+                items[0].SellIn.Should().Be(initialSellIn - i);
+                items[0].Quality.Should().Be(initialQuality - 2 * i);
             }
+        }
+
+        private IList<StoreItem> GetListWithSingleItem(ItemCategory category, string name, int sellIn, int quality)
+        {
+            StoreItem item = new(category, name, sellIn, quality);
+            return new List<StoreItem> { item };
         }
     }
 }

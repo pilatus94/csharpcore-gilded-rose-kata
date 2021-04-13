@@ -1,13 +1,13 @@
-﻿using Xunit;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using ApprovalTests;
 using ApprovalTests.Reporters;
+using Xunit;
 
-namespace csharpcore
+namespace csharpcore.Tests
 {
-    [UseReporter()]
+    [UseReporter(typeof(DiffReporter))]
     public class ApprovalTest
     {
         [Fact]

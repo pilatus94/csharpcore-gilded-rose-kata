@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using csharpcore.Items;
+using FluentAssertions;
 using Xunit;
 
-namespace csharpcore
+namespace csharpcore.Tests
 {
     public class GildedRoseTest
     {
@@ -98,7 +98,7 @@ namespace csharpcore
             }
         }
 
-        private IList<StoreItem> GetListWithSingleItem(ItemCategory category, string name, int sellIn, int quality)
+        private static IList<StoreItem> GetListWithSingleItem(ItemCategory category, string name, int sellIn, int quality)
         {
             StoreItem item = new(category, name, sellIn, quality);
             return new List<StoreItem> { item };

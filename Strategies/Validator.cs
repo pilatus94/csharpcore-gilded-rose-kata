@@ -1,4 +1,6 @@
-﻿namespace csharpcore.Strategies
+﻿using csharpcore.Items;
+
+namespace csharpcore.Strategies
 {
     public static class Validator
     {

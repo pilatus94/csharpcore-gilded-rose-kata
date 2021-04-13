@@ -1,4 +1,4 @@
-﻿namespace csharpcore
+﻿namespace csharpcore.Items
 {
     public class Item
     {

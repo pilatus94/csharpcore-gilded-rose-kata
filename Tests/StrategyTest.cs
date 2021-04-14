@@ -29,7 +29,7 @@ namespace csharpcore.Tests
         [InlineData(10, 2, 0)]
         [InlineData(-1, 10, 8)]
         [InlineData(-2, 0, 0)]
-        [InlineData(10, 50, 50)]
+        [InlineData(10, 50, 48)]
         public void ConjuredItemStrategy_UpdatesCorrectly(int initialSellIn, int initialQuality, int expectedQuality)
         {
             StoreItem item = new(ItemCategory.Conjured, "Conjured", initialSellIn, initialQuality);

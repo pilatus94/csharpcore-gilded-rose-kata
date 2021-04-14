@@ -7,7 +7,7 @@ namespace csharpcore.Strategies
         public void Update(Item item)
         {
             item.SellIn -= 1;
-            item.Quality += 1;
+            item.Quality += item.SellIn < 0 ? 2 : 1;
             item.ValidateQuality();
         }
     }
